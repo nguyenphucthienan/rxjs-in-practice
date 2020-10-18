@@ -3,8 +3,9 @@ import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {Course} from '../model/course';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import * as moment from 'moment';
-import {concatMap, filter} from 'rxjs/operators';
+import {concatMap, exhaustMap, filter} from 'rxjs/operators';
 import {fromPromise} from 'rxjs/internal-compatibility';
+import {fromEvent} from 'rxjs';
 
 @Component({
   selector: 'course-dialog',
@@ -43,6 +44,11 @@ export class CourseDialogComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit() {
+    fromEvent(this.saveButton.nativeElement, 'click')
+      .pipe(
+        exhaustMap(() => this.saveCourse(this.form.value))
+      )
+      .subscribe();
   }
 
   saveCourse(changes) {
