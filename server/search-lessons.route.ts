@@ -4,13 +4,13 @@ import {setTimeout} from 'timers';
 
 export function searchLessons(req: Request, res: Response) {
   const queryParams = req.query;
-  const courseId = queryParams.courseId;
+  const courseId = parseInt(<string>queryParams.courseId, 10);
   const filter = queryParams.filter || '';
   const sortOrder = queryParams.sortOrder || 'asc';
   const pageNumber = parseInt(<string>queryParams.pageNumber, 10) || 0;
   const pageSize = parseInt(<string>queryParams.pageSize, 10) || 3;
 
-  let lessons = Object.values(LESSONS).filter(lesson => lesson.courseId === <number><unknown>courseId).sort((l1, l2) => l1.id - l2.id);
+  let lessons = Object.values(LESSONS).filter(lesson => lesson.courseId === courseId).sort((l1, l2) => l1.id - l2.id);
 
   if (filter) {
     lessons = lessons.filter(lesson => lesson.description.trim().toLowerCase().search((<string>filter).toLowerCase()) >= 0);
