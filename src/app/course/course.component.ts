@@ -4,7 +4,7 @@ import {Course} from '../model/course';
 import {concat, fromEvent, Observable} from 'rxjs';
 import {Lesson} from '../model/lesson';
 import {createHttpObservable} from '../common/util';
-import {debounceTime, distinctUntilChanged, map, switchMap} from 'rxjs/operators';
+import {debounceTime, distinctUntilChanged, map, startWith, switchMap} from 'rxjs/operators';
 
 @Component({
   selector: 'course',
@@ -28,16 +28,14 @@ export class CourseComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit() {
-    const initialLesson$ = this.loadLessons();
-    const searchLesson$ = fromEvent(this.input.nativeElement, 'keyup')
+    this.lessons$ = fromEvent(this.input.nativeElement, 'keyup')
       .pipe(
+        startWith(''),
         map((event: Event) => (event.target as HTMLInputElement).value),
         debounceTime(500),
         distinctUntilChanged(),
         switchMap(search => this.loadLessons(search))
       );
-
-    this.lessons$ = concat(initialLesson$, searchLesson$);
   }
 
   loadLessons(search = ''): Observable<Lesson[]> {
