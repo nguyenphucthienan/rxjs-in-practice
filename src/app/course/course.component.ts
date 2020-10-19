@@ -6,6 +6,7 @@ import {Lesson} from '../model/lesson';
 import {createHttpObservable} from '../common/util';
 import {debounceTime, distinctUntilChanged, map, startWith, switchMap} from 'rxjs/operators';
 import {debug, RxJsLoggingLevel} from '../common/debug';
+import {Store} from '../common/store.service';
 
 @Component({
   selector: 'course',
@@ -14,21 +15,21 @@ import {debug, RxJsLoggingLevel} from '../common/debug';
 })
 export class CourseComponent implements OnInit, AfterViewInit {
 
-  courseId: string;
+  courseId: number;
   course$: Observable<Course>;
   lessons$: Observable<Lesson[]>;
 
   @ViewChild('searchInput', {static: true}) input: ElementRef;
 
-  constructor(private route: ActivatedRoute) {
+  constructor(
+    private route: ActivatedRoute,
+    private store: Store
+  ) {
   }
 
   ngOnInit() {
-    this.courseId = this.route.snapshot.params['id'];
-    this.course$ = createHttpObservable(`/api/courses/${this.courseId}`)
-      .pipe(
-        debug(RxJsLoggingLevel.INFO, 'Course')
-      );
+    this.courseId = parseInt(this.route.snapshot.params['id'], 10);
+    this.course$ = this.store.selectCourseById(this.courseId);
   }
 
   ngAfterViewInit() {

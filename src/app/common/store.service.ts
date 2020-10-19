@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {BehaviorSubject, Observable} from 'rxjs';
 import {Course} from '../model/course';
-import {filter, map, tap} from 'rxjs/operators';
+import {filter, map} from 'rxjs/operators';
 import {createHttpObservable} from './util';
 import {fromPromise} from 'rxjs/internal-compatibility';
 
@@ -16,14 +16,9 @@ export class Store {
 
   init() {
     const http$ = createHttpObservable('/api/courses');
-    http$
-      .pipe(
-        tap(() => console.log('HTTP request executed')),
-        map(res => Object.values(res['payload']))
-      )
-      .subscribe(
-        courses => this.subject.next(courses)
-      );
+    http$.pipe(
+      map(res => res['payload']),
+    ).subscribe(courses => this.subject.next(courses));
   }
 
   selectBeginnerCourses() {
@@ -37,7 +32,7 @@ export class Store {
   selectCourseById(courseId: number) {
     return this.courses$
       .pipe(
-        map(courses => courses.find(course => course.id == courseId)),
+        map(courses => courses.find(course => course.id === courseId)),
         filter(course => !!course)
       );
   }
@@ -46,13 +41,13 @@ export class Store {
     return this.courses$
       .pipe(
         map(courses => courses
-          .filter(course => course.category == category))
+          .filter(course => course.category === category))
       );
   }
 
   saveCourse(courseId: number, changes): Observable<any> {
     const courses = this.subject.getValue();
-    const courseIndex = courses.findIndex(course => course.id == courseId);
+    const courseIndex = courses.findIndex(course => course.id === courseId);
     const newCourses = courses.slice(0);
 
     newCourses[courseIndex] = {
@@ -66,7 +61,7 @@ export class Store {
       method: 'PUT',
       body: JSON.stringify(changes),
       headers: {
-        'content-type': 'application/json'
+        'Content-Type': 'application/json'
       }
     }));
   }
