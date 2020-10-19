@@ -17,9 +17,9 @@ export function setRxJsLoggingLevel(level: RxJsLoggingLevel) {
 export const debug = (level: number, message: string) =>
   (source: Observable<any>) => source
     .pipe(
-      tap(val => {
+      tap(value => {
         if (level >= rxjsLoggingLevel) {
-          console.log(message + ': ', val);
+          console.log(message + ' ', value);
         }
       })
     );
