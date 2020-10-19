@@ -1,8 +1,8 @@
 import {Component, OnInit} from '@angular/core';
 import {createHttpObservable} from '../common/util';
-import {map, shareReplay} from 'rxjs/operators';
+import {catchError, map, shareReplay} from 'rxjs/operators';
 import {Course} from '../model/course';
-import {Observable} from 'rxjs';
+import {Observable, of} from 'rxjs';
 
 @Component({
   selector: 'home',
@@ -21,7 +21,16 @@ export class HomeComponent implements OnInit {
     const http$ = createHttpObservable('/api/courses');
     const courses$: Observable<Course[]> = http$.pipe(
       map(res => res['payload']),
-      shareReplay()
+      shareReplay(),
+      catchError(err => of([{
+        id: 0,
+        description: 'RxJs In Practice Course',
+        iconUrl: 'https://s3-us-west-1.amazonaws.com/angular-university/course-images/rxjs-in-practice-course.png',
+        courseListIcon: 'https://angular-academy.s3.amazonaws.com/main-logo/main-page-logo-small-hat.png',
+        longDescription: 'Understand the RxJs Observable pattern, learn the RxJs Operators via practical examples',
+        category: 'BEGINNER',
+        lessonsCount: 10
+      }]))
     );
 
     this.beginnerCourses$ = courses$
